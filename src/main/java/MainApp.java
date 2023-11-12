@@ -5,15 +5,25 @@ import java.time.Instant;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
+/**
+ * Main application class for the Carbon Footprint Calculator.
+ */
 public class MainApp {
 
+    // MQTT broker configurations
     private static final String BROKER_URI = "tcp://192.168.56.1:1883";
     private static final String TOPIC_SUBSCRIBE = "footprint/average";
     private static final String TOPIC_PUBLISH = "footprint/userdata";
-
-    private static JTextField globalAverageField;
     static MqttClient mqttClient;
 
+    // UI components
+    private static JTextField globalAverageField;
+    private static JTextField value1Field, value2Field, value3Field, value4Field, value5Field, value6Field, value7Field, value8Field, value9Field, value10Field;
+
+    /**
+     * Main method to start the application.
+     * @param args Command-line arguments (not used).
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(MainApp::createAndShowGUI);
         try {
@@ -25,34 +35,56 @@ public class MainApp {
                 // Handle incoming messages from the subscribed topic
                 updateGlobalAverageField(message);
             });
-
-            //client.disconnect();
         } catch (MqttException ex) {
             ex.printStackTrace();
             System.out.println("No connection");
         }
-
     }
 
+    /**
+     * Creates and shows the graphical user interface.
+     */
     private static void createAndShowGUI() {
         JFrame frame = new JFrame("Carbon Footprint Calculator");
+        frame.setFont(new Font("SansSerif", Font.PLAIN, 18));
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setPreferredSize(new Dimension(550, 440));
+        mainPanel.setPreferredSize(new Dimension(600, 440));
 
-        // Panel for displaying global average
+        // Create and add the panel displaying global average and the panel for user input
+        createGlobalAveragePanel(mainPanel);
+        createUserInputPanel(mainPanel);
+
+        frame.getContentPane().add(mainPanel);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    /**
+     * Creates the panel displaying the global average.
+     * @param mainPanel The main panel to which the global average panel is added.
+     */
+    private static void createGlobalAveragePanel(JPanel mainPanel) {
         JPanel globalAveragePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         globalAveragePanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0)); // Add vertical space
         JLabel globalAverageLabel = new JLabel("Global average for today:");
+        globalAverageLabel.setFont(new Font("SansSerif", Font.PLAIN, 15));
         globalAverageField = new JTextField(10);
+        globalAverageField.setFont(new Font("SansSerif", Font.PLAIN, 15));
         globalAverageField.setEditable(false);
         globalAveragePanel.add(globalAverageLabel);
         globalAveragePanel.add(globalAverageField);
         mainPanel.add(globalAveragePanel, BorderLayout.NORTH);
+    }
 
-        // Panel for entering user data
+    /**
+     * Creates the panel for user input.
+     * @param mainPanel The main panel to which the user input panel is added.
+     */
+    private static void createUserInputPanel(JPanel mainPanel) {
         JLabel headerLabel = new JLabel("Enter your consumption for the day:");
+        headerLabel.setFont(new Font("SansSerif", Font.PLAIN, 15));
         headerLabel.setHorizontalAlignment(SwingConstants.CENTER);
         mainPanel.add(headerLabel, BorderLayout.CENTER);
 
@@ -60,68 +92,117 @@ public class MainApp {
         placeComponents(inputPanel);
 
         mainPanel.add(inputPanel, BorderLayout.SOUTH);
-
-        frame.getContentPane().add(mainPanel);
-        frame.pack();
-        frame.setVisible(true);
     }
 
+    /**
+     * Places the input components on the specified panel.
+     * @param panel The panel to which the input components are added.
+     */
     private static void placeComponents(JPanel panel) {
-
-        JLabel label1 = new JLabel("Beef (in grams):");
-        JTextField value1Field = new JTextField(10);
+        // Create and add labels and text fields for user input
+        JLabel label1 = createLabel("Beef (in gram):");
+        value1Field = new JTextField(10);
         panel.add(label1);
         panel.add(value1Field);
 
-        JLabel label2 = new JLabel("Pork (in gram):");
-        JTextField value2Field = new JTextField(10);
+        JLabel label2 = createLabel("Pork (in gram):");
+        value2Field = new JTextField(10);
         panel.add(label2);
         panel.add(value2Field);
 
-        JLabel label3 = new JLabel("Chicken (in gram):");
-        JTextField value3Field = new JTextField(10);
+        JLabel label3 = createLabel("Chicken (in gram):");
+        value3Field = new JTextField(10);
         panel.add(label3);
         panel.add(value3Field);
 
-        JLabel label4 = new JLabel("Fish (in gram):");
-        JTextField value4Field = new JTextField(10);
+        JLabel label4 = createLabel("Fish (in gram):");
+        value4Field = new JTextField(10);
         panel.add(label4);
         panel.add(value4Field);
 
-        JLabel label5 = new JLabel("Butter (in gram):");
-        JTextField value5Field = new JTextField(10);
+        JLabel label5 = createLabel("Butter (in gram):");
+        value5Field = new JTextField(10);
         panel.add(label5);
         panel.add(value5Field);
 
-        JLabel label6 = new JLabel("Other dairy products (in gram):");
-        JTextField value6Field = new JTextField(10);
+        JLabel label6 = createLabel("Other dairy products (in gram):");
+        value6Field = new JTextField(10);
         panel.add(label6);
         panel.add(value6Field);
 
-        JLabel label7 = new JLabel("Car (in km):");
-        JTextField value7Field = new JTextField(10);
+        JLabel label7 = createLabel("Car (in km):");
+        value7Field = new JTextField(10);
         panel.add(label7);
         panel.add(value7Field);
 
-        JLabel label8 = new JLabel("Public transport (in km):");
-        JTextField value8Field = new JTextField(10);
+        JLabel label8 = createLabel("Public transport (in km):");
+        value8Field = new JTextField(10);
         panel.add(label8);
         panel.add(value8Field);
 
-        JLabel label9 = new JLabel("Plane (in km):");
-        JTextField value9Field = new JTextField(10);
+        JLabel label9 = createLabel("Plane (in km):");
+        value9Field = new JTextField(10);
         panel.add(label9);
         panel.add(value9Field);
 
-        JLabel label10 = new JLabel("<html>Electrical appliances,<br>e.g. washing machine (in number of uses):</html>");
-        JTextField value10Field = new JTextField(10);
+        JLabel label10 = createLabel("<html>Electrical appliances,<br>e.g. washing machine (in number of uses):</html>");
+        value10Field = new JTextField(10);
         panel.add(label10);
         panel.add(value10Field);
 
+        // Create and add the submit button
         JButton submitButton = new JButton("Submit");
+        submitButton.setFont(new Font("SansSerif", Font.PLAIN, 13));
         panel.add(submitButton);
 
+        // Add action listener for the submit button
+        handleSubmitButton(panel, submitButton);
+    }
+
+    /**
+     * Creates a labeled JLabel with specified text and formatting.
+     * @param labelString The text for the label.
+     * @return The created JLabel.
+     */
+    private static JLabel createLabel(String labelString) {
+        JLabel label = new JLabel(labelString);
+        label.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        label.setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 0));
+        return label;
+    }
+
+    /**
+     * Adds action listener to the submit button.
+     * @param panel        The panel to which the submit button is added.
+     * @param submitButton The submit button.
+     */
+    private static void handleSubmitButton(JPanel panel, JButton submitButton) {
         submitButton.addActionListener(e -> {
+            float result = -1;
+            result = collectInput(result);
+
+            if (result != -1) {
+                String messageToSend = getCurrentTime() + "_" + result;
+                System.out.println("Message: " + messageToSend);
+
+                publishMessage(messageToSend);
+
+                String averageComparison = compareToAverage(result);
+
+                JOptionPane.showMessageDialog(panel, "Total consumption today: " + result + " grams of CO2\n" +
+                        averageComparison, "Result", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+    }
+
+    /**
+     * Collects user input from text fields and calculates the consumption.
+     * @param result The initial result value.
+     * @return The calculated consumption value.
+     */
+    private static float collectInput(float result) {
+        try {
+            // Parse user input from text fields
             int beef = Integer.parseInt(value1Field.getText());
             int pork = Integer.parseInt(value2Field.getText());
             int chicken = Integer.parseInt(value3Field.getText());
@@ -133,62 +214,71 @@ public class MainApp {
             int plane = Integer.parseInt(value9Field.getText());
             int electricalAppliances = Integer.parseInt(value10Field.getText());
 
-            float result = calculateConsumption(beef, pork, chicken, fish, butter, dairyProducts, car,
+            // Calculate consumption based on user input
+            result = calculateConsumption(beef, pork, chicken, fish, butter, dairyProducts, car,
                     pTransport, plane, electricalAppliances);
+        } catch (NumberFormatException exception) {
+            JOptionPane.showMessageDialog(null, "Please enter valid whole numbers in all fields.", "Input Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return result;
+    }
 
-            String messageToSend = getCurrentTime() + "_" + result;
-            System.out.println("Message: " + messageToSend);
+    /**
+     * Publishes the calculated message to the MQTT broker.
+     * @param messageToSend The message to be published.
+     */
+    private static void publishMessage(String messageToSend) {
+        // Publish the result to topic
+        MqttMessage mqttMessage = new MqttMessage(messageToSend.getBytes());
+        try {
+            mqttClient.publish(TOPIC_PUBLISH, mqttMessage);
+        } catch (MqttException mqttException) {
+            mqttException.printStackTrace();
+        }
+    }
 
-
-            // Publish the result to topic
-            MqttMessage mqttMessage = new MqttMessage(messageToSend.getBytes());
-            try {
-                mqttClient.publish(TOPIC_PUBLISH, mqttMessage);
-            } catch (MqttException mqttException) {
-                mqttException.printStackTrace();
-            }
-
-            String averageComparison = "The average for today is: ";
-            if (!globalAverageField.getText().isEmpty()) {
-                // Convert the string to a floating-point number
-                double averageValue = Double.parseDouble(globalAverageField.getText());
-                if (result < averageValue) {
-                    averageComparison += averageValue + ". You have consumed less than the average. Nice!";
-                } else if (result > averageValue) {
-                    averageComparison += averageValue + ". You have consumed more than the average.\n" +
-                            "Try to lower your consumption!";
-                } else {
-                    averageComparison += averageValue + ". You have consumed exactly the average.";
-                }
+    /**
+     * Compares the user's consumption to the global average.
+     * @param result The user's calculated consumption.
+     * @return A string indicating the comparison result.
+     */
+    private static String compareToAverage(float result) {
+        String averageComparison = "The average for today is: ";
+        if (!globalAverageField.getText().isEmpty()) {
+            // Convert the string to a floating-point number
+            double averageValue = Double.parseDouble(globalAverageField.getText());
+            if (result < averageValue) {
+                averageComparison += averageValue + ". You have consumed less than the average. Nice!";
+            } else if (result > averageValue) {
+                averageComparison += averageValue + ". You have consumed more than the average.\n" +
+                        "Try to lower your consumption!";
             } else {
-                averageComparison = "You are the first to publish your data for the day.\n" +
-                        "Come back later to compare yourself to the average.";
+                averageComparison += averageValue + ". You have consumed exactly the average.";
             }
-
-            JOptionPane.showMessageDialog(panel, "Sum: " + result + "\n" +
-                    averageComparison, "Result", JOptionPane.INFORMATION_MESSAGE);
-        });
+        } else {
+            averageComparison = "You are the first to publish your data for the day.\n" +
+                    "Come back later to compare yourself to the average.";
+        }
+        return averageComparison;
     }
 
-    public static String getCurrentTime() {
-        Instant instant = Instant.now();
-        long currentTimeMillis = instant.toEpochMilli();
-        //System.out.println("Current time: " + currentTimeMillis + " milliseconds");
-        return String.valueOf(currentTimeMillis);
-    }
-
-    // Method to update the global average field with the incoming message
-    private static void updateGlobalAverageField(MqttMessage mqttMessage) {
-        String incomingMessage = new String(mqttMessage.getPayload());
-        // Convert the string to a floating-point number
-        double incomingValue = Double.parseDouble(incomingMessage);
-        // Format the number to a string with two decimal places
-        String formattedValue = String.format("%.2f", incomingValue);
-        SwingUtilities.invokeLater(() -> globalAverageField.setText(formattedValue));
-    }
-
+    /**
+     * Calculates the CO2 consumption based on user input.
+     * @param beef                 Grams of beef consumed.
+     * @param pork                 Grams of pork consumed.
+     * @param chicken              Grams of chicken consumed.
+     * @param fish                 Grams of fish consumed.
+     * @param butter               Grams of butter consumed.
+     * @param dairyProducts        Grams of other dairy products consumed.
+     * @param carKm                Kilometers traveled by car.
+     * @param pTransportKm         Kilometers traveled by public transport.
+     * @param planeKm              Kilometers traveled by plane.
+     * @param electricalAppliances Number of uses of electrical appliances.
+     * @return The calculated CO2 consumption.
+     */
     private static float calculateConsumption(int beef, int pork, int chicken, int fish, int butter, int dairyProducts, int carKm,
                                               int pTransportKm, int planeKm, int electricalAppliances) {
+        // Calculate consumption for each category
         float beefConsumption = (float) (beef * 16.88);
         float porkConsumption = (float) (pork * 6.92);
         float chickenConsumption = (float) (chicken * 2.79);
@@ -200,8 +290,32 @@ public class MainApp {
         float planeConsumption = planeKm * 365;
         float appliancesConsumption = electricalAppliances * 750;
 
+        // Sum up the consumptions to get the total CO2 consumption
         return beefConsumption + porkConsumption + chickenConsumption + fishConsumption + butterConsumption
                 + dairyProductsConsumption + carConsumption + pTransportConsumption + planeConsumption + appliancesConsumption;
+    }
+
+    /**
+     * Gets the current time in milliseconds.
+     * @return The current time in milliseconds.
+     */
+    private static String getCurrentTime() {
+        Instant instant = Instant.now();
+        long currentTimeMillis = instant.toEpochMilli();
+        //System.out.println("Current time: " + currentTimeMillis + " milliseconds");
+        return String.valueOf(currentTimeMillis);
+    }
+
+    /**
+     * Updates the global average field with the incoming MQTT message.
+     * @param mqttMessage The incoming MQTT message.
+     */
+    private static void updateGlobalAverageField(MqttMessage mqttMessage) {
+        String incomingMessage = new String(mqttMessage.getPayload());
+        double incomingValue = Double.parseDouble(incomingMessage);
+        // Format the number to a string with two decimal places
+        String formattedValue = String.format("%.2f", incomingValue);
+        SwingUtilities.invokeLater(() -> globalAverageField.setText(formattedValue));
     }
 }
 
