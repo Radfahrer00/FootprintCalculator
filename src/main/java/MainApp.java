@@ -34,6 +34,16 @@ public class MainApp {
             mqttClient.subscribe(TOPIC_SUBSCRIBE, (topic, message) -> {
                 // Handle incoming messages from the subscribed topic
                 updateGlobalAverageField(message);
+
+                Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                    try {
+                        if (mqttClient != null && mqttClient.isConnected()) {
+                            mqttClient.disconnect();
+                        }
+                    } catch (MqttException e) {
+                        e.printStackTrace();
+                    }
+                }));
             });
         } catch (MqttException ex) {
             ex.printStackTrace();
