@@ -213,7 +213,19 @@ public class MainApp {
     private static float collectInput(float result) {
         try {
             // Parse user input from text fields
-            int beef = Integer.parseInt(value1Field.getText());
+            int beef = Integer.parseInt(value1Field.getText().isEmpty() ? "0" : value1Field.getText());
+            int pork = Integer.parseInt(value2Field.getText().isEmpty() ? "0" : value2Field.getText());
+            int chicken = Integer.parseInt(value3Field.getText().isEmpty() ? "0" : value3Field.getText());
+            int fish = Integer.parseInt(value4Field.getText().isEmpty() ? "0" : value4Field.getText());
+            int butter = Integer.parseInt(value5Field.getText().isEmpty() ? "0" : value5Field.getText());
+            int dairyProducts = Integer.parseInt(value6Field.getText().isEmpty() ? "0" : value6Field.getText());
+            int car = Integer.parseInt(value7Field.getText().isEmpty() ? "0" : value7Field.getText());
+            int pTransport = Integer.parseInt(value8Field.getText().isEmpty() ? "0" : value8Field.getText());
+            int plane = Integer.parseInt(value9Field.getText().isEmpty() ? "0" : value9Field.getText());
+            int electricalAppliances = Integer.parseInt(value10Field.getText().isEmpty() ? "0" : value10Field.getText());
+
+
+           /* int beef = Integer.parseInt(value1Field.getText());
             int pork = Integer.parseInt(value2Field.getText());
             int chicken = Integer.parseInt(value3Field.getText());
             int fish = Integer.parseInt(value4Field.getText());
@@ -222,7 +234,7 @@ public class MainApp {
             int car = Integer.parseInt(value7Field.getText());
             int pTransport = Integer.parseInt(value8Field.getText());
             int plane = Integer.parseInt(value9Field.getText());
-            int electricalAppliances = Integer.parseInt(value10Field.getText());
+            int electricalAppliances = Integer.parseInt(value10Field.getText());*/
 
             // Calculate consumption based on user input
             result = calculateConsumption(beef, pork, chicken, fish, butter, dairyProducts, car,
@@ -322,9 +334,9 @@ public class MainApp {
      */
     private static void updateGlobalAverageField(MqttMessage mqttMessage) {
         String incomingMessage = new String(mqttMessage.getPayload());
-        double incomingValue = Double.parseDouble(incomingMessage);
+        float incomingValue = Float.parseFloat(incomingMessage);
         // Format the number to a string with two decimal places
-        String formattedValue = String.format("%.2f", incomingValue);
+        String formattedValue = String.format("%.2f", incomingValue).replace(",", ".");
         SwingUtilities.invokeLater(() -> globalAverageField.setText(formattedValue));
     }
 }
