@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.time.Instant;
 
 import org.eclipse.paho.client.mqttv3.*;
@@ -17,7 +15,7 @@ public class MainApp {
     static MqttClient mqttClient;
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> createAndShowGUI());
+        SwingUtilities.invokeLater(MainApp::createAndShowGUI);
         try {
             mqttClient = new MqttClient(BROKER_URI, MqttClient.generateClientId(), new MemoryPersistence());
             mqttClient.connect();
@@ -123,55 +121,52 @@ public class MainApp {
         JButton submitButton = new JButton("Submit");
         panel.add(submitButton);
 
-        submitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int beef = Integer.parseInt(value1Field.getText());
-                int pork = Integer.parseInt(value2Field.getText());
-                int chicken = Integer.parseInt(value3Field.getText());
-                int fish = Integer.parseInt(value4Field.getText());
-                int butter = Integer.parseInt(value5Field.getText());
-                int dairyProducts = Integer.parseInt(value6Field.getText());
-                int car = Integer.parseInt(value7Field.getText());
-                int pTransport = Integer.parseInt(value8Field.getText());
-                int plane = Integer.parseInt(value9Field.getText());
-                int electricalAppliances = Integer.parseInt(value10Field.getText());
+        submitButton.addActionListener(e -> {
+            int beef = Integer.parseInt(value1Field.getText());
+            int pork = Integer.parseInt(value2Field.getText());
+            int chicken = Integer.parseInt(value3Field.getText());
+            int fish = Integer.parseInt(value4Field.getText());
+            int butter = Integer.parseInt(value5Field.getText());
+            int dairyProducts = Integer.parseInt(value6Field.getText());
+            int car = Integer.parseInt(value7Field.getText());
+            int pTransport = Integer.parseInt(value8Field.getText());
+            int plane = Integer.parseInt(value9Field.getText());
+            int electricalAppliances = Integer.parseInt(value10Field.getText());
 
-                float result = calculateConsumption(beef, pork, chicken, fish, butter, dairyProducts, car,
-                        pTransport, plane, electricalAppliances);
+            float result = calculateConsumption(beef, pork, chicken, fish, butter, dairyProducts, car,
+                    pTransport, plane, electricalAppliances);
 
-                String messageToSend = getCurrentTime() + "_" + result;
-                System.out.println("Message: " + messageToSend);
+            String messageToSend = getCurrentTime() + "_" + result;
+            System.out.println("Message: " + messageToSend);
 
 
-                // Publish the result to topic
-                MqttMessage mqttMessage = new MqttMessage(messageToSend.getBytes());
-                try {
-                    mqttClient.publish(TOPIC_PUBLISH, mqttMessage);
-                } catch (MqttException mqttException) {
-                    mqttException.printStackTrace();
-                }
-
-                String averageComparison = "The average for today is: ";
-                if (!globalAverageField.getText().isEmpty()) {
-                    // Convert the string to a floating-point number
-                    double averageValue = Double.parseDouble(globalAverageField.getText());
-                    if (result < averageValue) {
-                        averageComparison += averageValue + ". You have consumed less than the average. Nice!";
-                    } else if (result > averageValue) {
-                        averageComparison += averageValue + ". You have consumed more than the average.\n" +
-                                "Try to lower your consumption!";
-                    } else {
-                        averageComparison += averageValue + ". You have consumed exactly the average.";
-                    }
-                } else {
-                    averageComparison = "You are the first to publish your data for the day.\n" +
-                            "Come back later to compare yourself to the average.";
-                }
-
-                JOptionPane.showMessageDialog(panel, "Sum: " + result + "\n" +
-                        averageComparison, "Result", JOptionPane.INFORMATION_MESSAGE);
+            // Publish the result to topic
+            MqttMessage mqttMessage = new MqttMessage(messageToSend.getBytes());
+            try {
+                mqttClient.publish(TOPIC_PUBLISH, mqttMessage);
+            } catch (MqttException mqttException) {
+                mqttException.printStackTrace();
             }
+
+            String averageComparison = "The average for today is: ";
+            if (!globalAverageField.getText().isEmpty()) {
+                // Convert the string to a floating-point number
+                double averageValue = Double.parseDouble(globalAverageField.getText());
+                if (result < averageValue) {
+                    averageComparison += averageValue + ". You have consumed less than the average. Nice!";
+                } else if (result > averageValue) {
+                    averageComparison += averageValue + ". You have consumed more than the average.\n" +
+                            "Try to lower your consumption!";
+                } else {
+                    averageComparison += averageValue + ". You have consumed exactly the average.";
+                }
+            } else {
+                averageComparison = "You are the first to publish your data for the day.\n" +
+                        "Come back later to compare yourself to the average.";
+            }
+
+            JOptionPane.showMessageDialog(panel, "Sum: " + result + "\n" +
+                    averageComparison, "Result", JOptionPane.INFORMATION_MESSAGE);
         });
     }
 
@@ -205,9 +200,8 @@ public class MainApp {
         float planeConsumption = planeKm * 365;
         float appliancesConsumption = electricalAppliances * 750;
 
-        float totalConsumption = beefConsumption + porkConsumption + chickenConsumption + fishConsumption + butterConsumption
+        return beefConsumption + porkConsumption + chickenConsumption + fishConsumption + butterConsumption
                 + dairyProductsConsumption + carConsumption + pTransportConsumption + planeConsumption + appliancesConsumption;
-        return totalConsumption;
     }
 }
 
