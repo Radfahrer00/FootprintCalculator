@@ -224,18 +224,6 @@ public class MainApp {
             int plane = Integer.parseInt(value9Field.getText().isEmpty() ? "0" : value9Field.getText());
             int electricalAppliances = Integer.parseInt(value10Field.getText().isEmpty() ? "0" : value10Field.getText());
 
-
-           /* int beef = Integer.parseInt(value1Field.getText());
-            int pork = Integer.parseInt(value2Field.getText());
-            int chicken = Integer.parseInt(value3Field.getText());
-            int fish = Integer.parseInt(value4Field.getText());
-            int butter = Integer.parseInt(value5Field.getText());
-            int dairyProducts = Integer.parseInt(value6Field.getText());
-            int car = Integer.parseInt(value7Field.getText());
-            int pTransport = Integer.parseInt(value8Field.getText());
-            int plane = Integer.parseInt(value9Field.getText());
-            int electricalAppliances = Integer.parseInt(value10Field.getText());*/
-
             // Calculate consumption based on user input
             result = calculateConsumption(beef, pork, chicken, fish, butter, dairyProducts, car,
                     pTransport, plane, electricalAppliances);
@@ -324,7 +312,6 @@ public class MainApp {
     private static String getCurrentTime() {
         Instant instant = Instant.now();
         long currentTimeMillis = instant.toEpochMilli();
-        //System.out.println("Current time: " + currentTimeMillis + " milliseconds");
         return String.valueOf(currentTimeMillis);
     }
 
