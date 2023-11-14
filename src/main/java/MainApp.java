@@ -247,9 +247,8 @@ public class MainApp {
      */
     private static void publishMessage(String messageToSend) {
         // Publish the result to topic
-        MqttMessage mqttMessage = new MqttMessage(messageToSend.getBytes());
         try {
-            mqttClient.publish(TOPIC_PUBLISH, mqttMessage);
+            mqttClient.publish(TOPIC_PUBLISH, messageToSend.getBytes(), 2, false);
         } catch (MqttException mqttException) {
             mqttException.printStackTrace();
         }
