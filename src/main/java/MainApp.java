@@ -22,6 +22,7 @@ public class MainApp {
 
     /**
      * Main method to start the application.
+     *
      * @param args Command-line arguments (not used).
      */
     public static void main(String[] args) {
@@ -73,6 +74,7 @@ public class MainApp {
 
     /**
      * Creates the panel displaying the global average.
+     *
      * @param mainPanel The main panel to which the global average panel is added.
      */
     private static void createGlobalAveragePanel(JPanel mainPanel) {
@@ -90,6 +92,7 @@ public class MainApp {
 
     /**
      * Creates the panel for user input.
+     *
      * @param mainPanel The main panel to which the user input panel is added.
      */
     private static void createUserInputPanel(JPanel mainPanel) {
@@ -106,6 +109,7 @@ public class MainApp {
 
     /**
      * Places the input components on the specified panel.
+     *
      * @param panel The panel to which the input components are added.
      */
     private static void placeComponents(JPanel panel) {
@@ -171,6 +175,7 @@ public class MainApp {
 
     /**
      * Creates a labeled JLabel with specified text and formatting.
+     *
      * @param labelString The text for the label.
      * @return The created JLabel.
      */
@@ -183,6 +188,7 @@ public class MainApp {
 
     /**
      * Adds action listener to the submit button.
+     *
      * @param panel        The panel to which the submit button is added.
      * @param submitButton The submit button.
      */
@@ -207,6 +213,7 @@ public class MainApp {
 
     /**
      * Collects user input from text fields and calculates the consumption.
+     *
      * @param result The initial result value.
      * @return The calculated consumption value.
      */
@@ -235,6 +242,7 @@ public class MainApp {
 
     /**
      * Publishes the calculated message to the MQTT broker.
+     *
      * @param messageToSend The message to be published.
      */
     private static void publishMessage(String messageToSend) {
@@ -249,6 +257,7 @@ public class MainApp {
 
     /**
      * Compares the user's consumption to the global average.
+     *
      * @param result The user's calculated consumption.
      * @return A string indicating the comparison result.
      */
@@ -256,14 +265,18 @@ public class MainApp {
         String averageComparison = "The average for today is: ";
         if (!globalAverageField.getText().isEmpty()) {
             // Convert the string to a floating-point number
-            double averageValue = Double.parseDouble(globalAverageField.getText());
-            if (result < averageValue) {
-                averageComparison += averageValue + ". You have consumed less than the average. Nice!";
-            } else if (result > averageValue) {
-                averageComparison += averageValue + ". You have consumed more than the average.\n" +
-                        "Try to lower your consumption!";
-            } else {
-                averageComparison += averageValue + ". You have consumed exactly the average.";
+            try {
+                double averageValue = Double.parseDouble(globalAverageField.getText());
+                if (result < averageValue) {
+                    averageComparison += averageValue + ". You have consumed less than the average. Nice!";
+                } else if (result > averageValue) {
+                    averageComparison += averageValue + ". You have consumed more than the average.\n" +
+                            "Try to lower your consumption!";
+                } else {
+                    averageComparison += averageValue + ". You have consumed exactly the average.";
+                }
+            } catch (NumberFormatException e) {
+                averageComparison = "You cannot compare your consumption to the average, as the server is down.";
             }
         } else {
             averageComparison = "You are the first to publish your data for the day.\n" +
@@ -274,6 +287,7 @@ public class MainApp {
 
     /**
      * Calculates the CO2 consumption based on user input.
+     *
      * @param beef                 Grams of beef consumed.
      * @param pork                 Grams of pork consumed.
      * @param chicken              Grams of chicken consumed.
@@ -307,6 +321,7 @@ public class MainApp {
 
     /**
      * Gets the current time in milliseconds.
+     *
      * @return The current time in milliseconds.
      */
     private static String getCurrentTime() {
@@ -317,14 +332,28 @@ public class MainApp {
 
     /**
      * Updates the global average field with the incoming MQTT message.
+     *
      * @param mqttMessage The incoming MQTT message.
      */
     private static void updateGlobalAverageField(MqttMessage mqttMessage) {
         String incomingMessage = new String(mqttMessage.getPayload());
-        float incomingValue = Float.parseFloat(incomingMessage);
-        // Format the number to a string with two decimal places
-        String formattedValue = String.format("%.2f", incomingValue).replace(",", ".");
-        SwingUtilities.invokeLater(() -> globalAverageField.setText(formattedValue));
+
+        if (incomingMessage.equals("Node Red Server is unexpectedly down.") || incomingMessage.equals("Node Red Server is currently down.")) {
+
+            SwingUtilities.invokeLater(() -> globalAverageField.setText("Server down"));
+        } else {
+            try {
+                float incomingValue = Float.parseFloat(incomingMessage);
+                // Format the number to a string with two decimal places
+                String formattedValue = String.format("%.2f", incomingValue).replace(",", ".");
+                SwingUtilities.invokeLater(() -> globalAverageField.setText(formattedValue));
+            } catch (ArrayIndexOutOfBoundsException e) {
+                System.out.println("Error while parsing incomming message: " + e.getMessage());
+            } /*finally {
+                System.out.println("try-catch was processed.");
+            }*/
+
+        }
     }
 }
 
